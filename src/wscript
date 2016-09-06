@@ -5,23 +5,30 @@ from os import path
 
 def build(bld):
     #warning: order matters (pcre2plus should be before pcre2)
-    conan_deps = ['pcre2plus', 'pcre2']
+    conan_deps = ['pcre2plus', 'pcre2', 'commonex']
+
+    bld(
+        name            = 'cppgherkin',
+        includes        = ['.'],
+        export_includes = ['.'],
+        use             = conan_deps
+    )
 
     #Compile an executable from cpp files on source dir
     bld.program(
         target   = 'program',
         source   = ['main.cpp'],
         includes = ['.'],
-        use      = conan_deps)
+        use      = ['cppgherkin'])
 
     bld.program(
         target   = 'regextest',
         source   = ['regextest.cpp'],
-        linkflags=['-rdynamic'],
         includes = ['.'],
-        use      = conan_deps)
+        use      = ['cppgherkin'])
 
-
+    if bld.env.build_tests:
+        bld.recurse('test')
 
 def glob(bld, *k, **kw):
     '''Helper to execute an ant_glob search.

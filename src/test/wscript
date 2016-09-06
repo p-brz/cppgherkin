@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+def build(ctx):
+    ctx.program(
+        target='tests',
+        source=ctx.path.ant_glob("*.cpp"),
+        includes='.',
+        use     = ['cppgherkin', 'catch'])
