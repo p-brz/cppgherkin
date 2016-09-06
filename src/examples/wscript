@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from os import path
+
+def build(bld):
+    bld.program(
+        target   = 'program',
+        source   = ['main.cpp'],
+        includes = ['.'],
+        use      = ['cppgherkin'])
+
+    bld.program(
+        target   = 'regextest',
+        source   = ['regextest.cpp'],
+        includes = ['.'],
+        use      = ['cppgherkin'])
+
+    bld.program(
+        target   = 'parser',
+        source   = ['parse_gherkin.cpp'],
+        includes = ['.'],
+        use      = ['cppgherkin'])
+

@@ -16,6 +16,7 @@ public:
 	void parse(){
 		parseDefinition(feature());
 		parseDescription(feature().description());
+		parseScenarios();
 	}
 
 	Feature & feature(){ return _feature;}
@@ -23,8 +24,9 @@ public:
 	Feature & feature() const{ return _feature;}
 
 protected:
-	void parseDefinition(Section & section);
-	void parseDescription(SectionDescription & detail);
+	bool parseDefinition(Section & section);
+	void parseDescription(SectionDescription & detail, bool extractKey=false);
+	void parseScenarios();
 
 	template<typename ...Args>
 	bool findPattern(const std::string & expectedToken, Args&&... outArgs);
@@ -32,6 +34,10 @@ protected:
 private:
 	std::istream & input;
 	Feature _feature;
+
+	RegexMatcher descriptionLineMatcher{R"(^[\s]*(.*)$)"},
+		emptyLineMatcher{R"(^[\s]*$)"},
+		stepMatcher{R"(^[\s]*([\S]*)[\s]*(.*)$)"};
 };
 
 static inline std::string &ltrim(std::string &s) {
@@ -76,30 +82,51 @@ bool FeatureParser::findPattern(const std::string & pattern, Args&&... outArgs){
 }
 
 inline
-void FeatureParser::parseDefinition(Section & section){
-	constexpr auto featurePattern = R"(^[\s]*Feature:[\s]*(.*)$)";
+bool FeatureParser::parseDefinition(Section & section){
+	constexpr auto featurePattern = R"(^[\s]*([\S]*):[\s]*(.*)$)";
 
-	std::string title;
-	if(findPattern(featurePattern, title)){
+	std::string key, title;
+	if(findPattern(featurePattern, key, title)){
+		section.key(std::move(ltrim(key)));
 		section.title(std::move(ltrim(title)));
+
+		return true;
 	}
 
+	return false;
 }
 
-void FeatureParser::parseDescription(SectionDescription & detail){
-	RegexMatcher nonEmptyLineMatcher{R"(^[\s]*(.*)$)"};
+void FeatureParser::parseDescription(SectionDescription & detail, bool extractKey){
 
 	std::string line;
 	while(std::getline(input, line)){
 		if(line.empty()){
 			return;
 		}
-		auto result = nonEmptyLineMatcher.match(line);
-		if(!result){
+		if(emptyLineMatcher.match(line)){
 			return;
 		}
 
-		detail.addLine(rtrim(result[0]));
+		auto & matcher = extractKey ? stepMatcher : descriptionLineMatcher;
+		auto result = matcher.match(line);
+		if(result.groups().size() == 1){
+			detail.addLine(rtrim(result[0]));
+		}
+		else{
+			detail.addLine(SectionLine().key(result[0]).phrase(result[1]));
+		}
+	}
+}
+
+void FeatureParser::parseScenarios(){
+	while(input){
+		Section scenario;
+		if(!parseDefinition(scenario)){
+			break;
+		}
+		parseDescription(scenario.description(), true);
+
+		feature().add(std::move(scenario));
 	}
 }
 

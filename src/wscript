@@ -14,18 +14,7 @@ def build(bld):
         use             = conan_deps
     )
 
-    #Compile an executable from cpp files on source dir
-    bld.program(
-        target   = 'program',
-        source   = ['main.cpp'],
-        includes = ['.'],
-        use      = ['cppgherkin'])
-
-    bld.program(
-        target   = 'regextest',
-        source   = ['regextest.cpp'],
-        includes = ['.'],
-        use      = ['cppgherkin'])
+    bld.recurse('examples')
 
     if bld.env.build_tests:
         bld.recurse('test')

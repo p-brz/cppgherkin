@@ -2,26 +2,20 @@
 #define SECTION_H
 
 #include "SectionDescription.h"
-
-#define MAKE_PROPERTY_GETTER(type, name)\
-	const type & name() const{\
-		return _##name;\
-	}
-#define MAKE_PROPERTY_SETTER(Class, type, name)\
-	template<typename T=type>\
-	Class & name(T&& value){\
-		_##name = value;\
-		return *this;\
-	}
-
-#define MAKE_PROPERTY(Class, type, name)\
-	MAKE_PROPERTY_GETTER(type, name)\
-	MAKE_PROPERTY_SETTER(Class, type, name)
+#include "../utils/MakeProperty.h"
 
 namespace cppgherkin {
 
 class Section{
 public:
+	Section() = default;
+	template<typename Key, typename Title>
+	Section(Key&& key, Title&& title, const SectionDescription & desc ={})
+		: _key(key)
+		, _title(title)
+		, _description(desc)
+	{}
+
 	MAKE_PROPERTY(Section, std::string, title)
 	MAKE_PROPERTY(Section, std::string, key)
 
@@ -37,13 +31,10 @@ private:
 std::ostream & operator<<(std::ostream & os, const Section & sect){
 	os << sect.key() << ": " << sect.title() << std::endl;
 
-	bool first=true;
 	for(const auto & line : sect.description().lines()){
-		if(!first){
-			os << "\n\t";
-		}
+		os << "\t";
 		os << line;
-		first = false;
+		os << std::endl;
 	}
 
 	return os;
