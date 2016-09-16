@@ -11,6 +11,7 @@ class MyConanFile(ConanFile):
     requires = (
         "pcre2plus/0.0.4-beta@paulobrizolara/experimental",
         "commonex/1.0.0@paulobrizolara/stable",
+        "function_traits/0.0.1-d5bc85c@paulobrizolara/master",
 
         "runcommand-waf-tool/1.0.0@paulobrizolara/master",
         "WafGenerator/0.0.1@paulobrizolara/experimental"
@@ -21,6 +22,8 @@ class MyConanFile(ConanFile):
     )
 
     generators = "Waf"
+
+    default_options = "FakeIt:header_version=catch"
 
     def imports(self):
         self.copy("*.dll", dst="bin", src="bin") # From bin to bin

@@ -6,4 +6,4 @@ def build(ctx):
         target='tests',
         source=ctx.path.ant_glob("*.cpp"),
         includes='.',
-        use     = ['cppgherkin', 'catch'])
+        use     = ['cppgherkin', 'catch', 'FakeIt'])

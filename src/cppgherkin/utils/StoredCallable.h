@@ -2,7 +2,19 @@
 #define STOREDCALLABLE_H
 
 #include <functional>
+#include <regex>
 #include "TupleIterator.h"
+
+#include "function_traits.hpp"
+
+
+namespace fn_traits {
+	//Extending function traits to support reference_wrapper
+	template<typename T>
+	struct function_traits<std::reference_wrapper<T>>
+		: public function_traits<fn_result_of<decltype(&std::reference_wrapper<T>::get)>>
+	{};
+}//namespace
 
 namespace cppgherkin {
 
@@ -14,70 +26,48 @@ template<int N, int ...S> struct gens : gens<N-1, N-1, S...> {};
 
 template<int ...S> struct gens<0, S...>{ typedef seq<S...> type; };
 
-template <typename Ret, typename ...Args>
-class save_it_for_later{
-public:
-	using Params = std::tuple<Args...>;
-	using Callable = std::function<Ret(Args...)>;
 
+template<typename Callable>
+class StoredCallable{
 public:
-	save_it_for_later(Callable c, Params p = {})
+	typedef fn_traits::function_traits<Callable> func_traits;
+	typedef typename func_traits::tuple_type StoredParams;
+	typedef typename func_traits::return_type return_type;
+
+	StoredCallable(Callable c, StoredParams p = {})
 		: func(c)
 		, _params(p)
 	{}
 
-	Ret operator()(){
-		return callFunc(typename gens<sizeof...(Args)>::type());
+	return_type operator()(){
+		return callFunc(typename gens<func_traits::arity>::type());
 	}
 
 	template<typename ParamBuilder>
-	Ret operator()(ParamBuilder&& builder){
+	return_type operator()(ParamBuilder&& builder){
 		iterate(builder, params());
 		return this->operator()();
 	}
 
-	Params & params(){ return _params;}
-	const Params & params() const{ return _params;}
+	StoredParams & params(){ return _params;}
+	const StoredParams & params() const{ return _params;}
 
 	Callable & callable() const{ return func;}
 
 private:
 	template<int ...S>
-	Ret callFunc(seq<S...>){
+	return_type callFunc(seq<S...>){
 		return func(std::get<S>(_params) ...);
 	}
 
 	Callable func;
-	Params _params;
+	StoredParams _params;
 };
 
-
-template<typename Ret, typename ...Args>
-std::function<Ret()> make_callable(Ret(* f)(Args...)){
-	save_it_for_later<Ret, Args...> saved = {f};
-
-	return std::function<Ret()>(saved);
+template<typename Callable>
+StoredCallable<Callable> makeStoredCallable(Callable c){
+	return {c};
 }
-
-
-template<typename Ret, typename ...Args>
-save_it_for_later<Ret, Args...> make_callable2(Ret(* f)(Args...)){
-	return {f};
-}
-template<typename Ret, typename ...Args>
-save_it_for_later<Ret, Args...> make_callable2(std::function<Ret(Args...)> f){
-	return {f};
-}
-
-template<typename ParamBuilder, typename Ret, typename ...Args>
-std::function<Ret()> make_callable(ParamBuilder paramBuilder, std::function<Ret(Args...)> f){
-	return std::function<Ret()>([=](){
-		ParamBuilder p = paramBuilder;
-		save_it_for_later<Ret, Args...> saved = {f};
-		return saved(p);
-	});
-}
-
 
 }//namespace
 

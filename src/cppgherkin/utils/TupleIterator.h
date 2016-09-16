@@ -28,6 +28,11 @@ void iterate(Visitor&& v, std::tuple<Ts...>& t) {
 	tuple_iterator<size - 1, Ts...>{}(std::forward<Visitor>(v), t);
 }
 
+template<typename Visitor>
+void iterate(Visitor&& v, std::tuple<>& t) { //empty tuple
+	//do nothing
+}
+
 }//namespace
 
 #endif // TUPLEITERATOR_H

@@ -7,8 +7,9 @@
 
 #include <map>
 #include <sstream>
-#include <regex>
+#include <algorithm>
 #include <list>
+#include <functional>
 
 #include <iostream>
 
@@ -127,7 +128,7 @@ public:
 	template<typename Fun>
 	Step(Fun f, const std::string & pattern){
 		stepFun = [f](Params & params) -> void{
-			auto callable = make_callable2(f);
+			auto callable = makeStoredCallable(f);
 			ParametersFillerColl<Params> filler(params);
 			callable(filler);
 		};
@@ -201,18 +202,18 @@ public:
 	void registerStep(const std::string & pattern, Fun f){
 		steps[pattern] = Step(f, pattern);
 	}
-	template<typename Ret, typename ...Args, typename Fun>
-	void registerStep(const std::string & pattern, Fun f){
-		steps[pattern] = Step(std::function<Ret(Args...)>(f), pattern);
-	}
 
 	void executeStep(const std::string & text){
-		//TODO: how to make it more efficient?
+		//TODO: how to make it more efficient? That is, how to avoid checking all registered steps?
 		for(auto iter = steps.begin(); iter != steps.end(); ++iter){
 			if(iter->second.execute(text)){
 				return;
 			}
 		}
+	}
+
+	void clear(){
+		steps.clear();
 	}
 
 	StepMap steps;
@@ -227,8 +228,12 @@ public:
 };
 
 
+/*Adapted from Catch code*/
 
-#define GEN_NAME(name) name##__LINE__
+#define INTERNAL_GEN_NAME_LINE2( name, line ) name##line
+#define INTERNAL_GEN_NAME_LINE( name, line ) INTERNAL_GEN_NAME_LINE2( name, line )
+#define GEN_NAME( name ) INTERNAL_GEN_NAME_LINE( name, __LINE__ )
+
 
 #define REGISTER_STEP(fn, desc)\
 	static auto GEN_NAME(__auto_register__) = AutoRegister<decltype(fn)>(fn, desc);

@@ -60,56 +60,9 @@ private:
 	mutable std::string joined;
 };
 
-std::ostream & operator<<(std::ostream & out, const SectionLine & line){
+inline std::ostream & operator<<(std::ostream & out, const SectionLine & line){
 	out << line.key() << " " << line.phrase();
 	return out;
-}
-
-class SectionDescription{
-public:
-	using Line = SectionLine;
-	using Lines = std::vector<Line>;
-
-public:
-	SectionDescription() = default;
-
-	template<typename LinesT>
-	SectionDescription(LinesT&& lines) : _lines(lines)
-	{}
-
-	size_t size() const{
-		return lines().size();
-	}
-
-	SectionDescription & addLine(const Line & l){
-		_lines.push_back(l);
-		return *this;
-	}
-
-	const Line & line(int index) const;
-
-	const Lines & lines() const;
-	SectionDescription & lines(const Lines & lines);
-
-private:
-	Lines _lines;
-};
-
-inline
-const SectionDescription::Line &SectionDescription::line(int index) const{
-	CHECK_BOUNDS(lines(), index);
-	return _lines[index];
-}
-
-inline
-const SectionDescription::Lines &SectionDescription::lines() const {
-	return _lines;
-}
-
-inline
-SectionDescription &SectionDescription::lines(const SectionDescription::Lines & lines) {
-	_lines = lines;
-	return *this;
 }
 
 }//namespace

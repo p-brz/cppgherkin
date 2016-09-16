@@ -15,7 +15,7 @@ public:
 
 	void parse(){
 		parseDefinition(feature());
-		parseDescription(feature().description());
+		parseDescription(feature());
 		parseScenarios();
 	}
 
@@ -25,7 +25,7 @@ public:
 
 protected:
 	bool parseDefinition(Section & section);
-	void parseDescription(SectionDescription & detail, bool extractKey=false);
+	void parseDescription(Section & section, bool extractKey=false);
 	void parseScenarios();
 
 	template<typename ...Args>
@@ -96,7 +96,7 @@ bool FeatureParser::parseDefinition(Section & section){
 	return false;
 }
 
-void FeatureParser::parseDescription(SectionDescription & detail, bool extractKey){
+void FeatureParser::parseDescription(Section & section, bool extractKey){
 
 	std::string line;
 	while(std::getline(input, line)){
@@ -110,21 +110,21 @@ void FeatureParser::parseDescription(SectionDescription & detail, bool extractKe
 		auto & matcher = extractKey ? stepMatcher : descriptionLineMatcher;
 		auto result = matcher.match(line);
 		if(result.groups().size() == 1){
-			detail.addLine(rtrim(result[0]));
+			section.addLine(rtrim(result[0]));
 		}
 		else{
-			detail.addLine(SectionLine().key(result[0]).phrase(result[1]));
+			section.addLine(SectionLine().key(result[0]).phrase(result[1]));
 		}
 	}
 }
 
 void FeatureParser::parseScenarios(){
 	while(input){
-		Section scenario;
+		Scenario scenario;
 		if(!parseDefinition(scenario)){
 			break;
 		}
-		parseDescription(scenario.description(), true);
+		parseDescription(scenario, true);
 
 		feature().add(std::move(scenario));
 	}

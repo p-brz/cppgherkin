@@ -17,3 +17,5 @@ conaninfo.txt
 *.creator.user
 *.files
 *.includes
+*.config
+

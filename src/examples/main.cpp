@@ -3,7 +3,6 @@
 #include <functional>
 #include <sstream>
 
-#include <type_traits>
 #include <tuple>
 
 #include "cppgherkin/cppgherkin.h"
@@ -23,7 +22,7 @@ void executeStep(const std::string & step){
 }
 
 int main(){
-	StepsStorage::instance().registerStep<void, string, int>(string("greeting {text} {int} times"),
+	StepsStorage::instance().registerStep("greeting {text} {int} times",
 	[](string person, int num){
 		for(int i=0; i < num; ++i){
 			cout << "Hello, " << person << "!" << endl;
@@ -39,7 +38,6 @@ int main(){
 	executeStep("5 monkeys of name 'hermano'");
 	executeStep("11 monkeys of name 'Fulano de tal'");
 	executeStep("greeting 'world' 10 times");
-
 
     return 0;
 }

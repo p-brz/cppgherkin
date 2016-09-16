@@ -54,10 +54,11 @@ void ParserTest::testFeatureDescription(){
 GIVEN("a feature file with title and description"){
 	Feature expected;
 	expected.title("some title")
-		.description()
-			.addLine("As a BDD tester")
-			.addLine("I want to describe my user story")
-			.addLine("To easy communicate the feature purpose.");
+			.lines({
+				"As a BDD tester"
+				,"I want to describe my user story"
+				,"To easy communicate the feature purpose."
+			});
 
 	stringstream content;
 	content << expected << endl;
@@ -69,11 +70,11 @@ THEN("the returned feature should have the given title"){
 	CHECK(f.title() == expected.title());
 
 THEN("the feature should keep the description lines"){
-	CHECK(f.description().lines().size() == 3);
-	auto&& lines = expected.description().lines();
+	CHECK(f.lines().size() == 3);
+	auto&& lines = expected.lines();
 	for (int i = 0; i < lines.size(); ++i) {
 		CAPTURE(i);
-		auto&& descLine = f.description().line(i);
+		auto&& descLine = f.line(i);
 		auto&& expected = lines[i];
 
 		CAPTURE(descLine);
@@ -155,16 +156,15 @@ THEN("the feature scenario should contains the right number of steps"){
 	CAPTURE(scenario.key());
 	CHECK(scenario.title() == "multisteps scenario");
 
-	auto & desc = scenario.description();
-	auto & lines = desc.lines();
+	auto & lines = scenario.lines();
 
 	CHECK(lines.size() == scenario_steps.size());
 
 THEN("each step should contain the key (first word) and the phrase"){
 	for (int i = 0; i < scenario_steps.size(); ++i) {
 		CAPTURE(i);
-		CHECK(scenario_steps[i].first == desc.line(i).key());
-		CHECK(scenario_steps[i].second == desc.line(i).phrase());
+		CHECK(scenario_steps[i].first == scenario.line(i).key());
+		CHECK(scenario_steps[i].second == scenario.line(i).phrase());
 	}
 
 }//THEN
@@ -180,19 +180,19 @@ GIVEN("a feature file with multiple scenarios"){
 	stringstream content;
 	content << "Feature: parse feature multi-scenarios\n\n";
 
-	vector<Section> scenarios = {
-		Section{"Scenario", "foobar", SectionDescription::Lines{
+	auto scenarios = vector<Section>{
+		Section{"Scenario", "foobar"}.lines({
 			{"Given", "foo"},
 			{"When", "bar"},
 			{"Then", "bazz"}
-		}},
-		Section{"Scenario", "one more", SectionDescription::Lines{
+		}),
+		Section{"Scenario", "one more"}.lines({
 			{"Given", "some condition"},
 			{"When", "doing some action"},
 			{"When", "do other action"},
 			{"Then", "a result should occur"},
 			{"And", "another side effect"}
-		}},
+		}),
 		Section{"Scenario", "minimum"}
 	};
 
@@ -208,10 +208,10 @@ THEN("the returned feature should contain all scenarios"){
 
 	for (size_t i = 0; i < scenarios.size(); ++i) {
 		auto&& scenario = f.scenario(i);
-		CHECK(scenario.description().size() == scenarios[i].description().size());
+		CHECK(scenario.lines().size() == scenarios[i].lines().size());
 
-		for (size_t j = 0; j < scenario.description().size(); ++j) {
-			CHECK(scenario.description().line(i) == scenarios[i].description().line(i));
+		for (size_t j = 0; j < scenario.lines().size(); ++j) {
+			CHECK(scenario.line(i) == scenarios[i].line(i));
 		}
 	}
 }//THEN

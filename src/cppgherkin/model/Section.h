@@ -1,37 +1,54 @@
 #ifndef SECTION_H
 #define SECTION_H
 
-#include "SectionDescription.h"
+#include "SectionLine.h"
 #include "../utils/MakeProperty.h"
 
 namespace cppgherkin {
 
 class Section{
 public:
+	using Line = SectionLine;
+	using Lines = std::vector<Line>;
+
+public:
+
+
 	Section() = default;
-	template<typename Key, typename Title>
-	Section(Key&& key, Title&& title, const SectionDescription & desc ={})
+	Section(const Section & other) = default;
+	Section(Section && other) = default;
+
+	Section(const std::string& key, const std::string& title=std::string())
 		: _key(key)
 		, _title(title)
-		, _description(desc)
 	{}
+
 
 	MAKE_PROPERTY(Section, std::string, title)
 	MAKE_PROPERTY(Section, std::string, key)
+	MAKE_PROPERTY(Section, Lines, lines)
 
-	const
-	SectionDescription & description() const { return _description;}
-	SectionDescription & description()	   { return _description;}
+
+public:
+	Section & addLine(const Line & l){
+		_lines.push_back(l);
+		return *this;
+	}
+
+	const Line & line(int index) const{
+		CHECK_BOUNDS(_lines, index);
+		return _lines[index];
+	}
 
 private:
 	std::string _key, _title;
-	SectionDescription _description;
+	Lines _lines;
 };
 
-std::ostream & operator<<(std::ostream & os, const Section & sect){
+inline std::ostream & operator<<(std::ostream & os, const Section & sect){
 	os << sect.key() << ": " << sect.title() << std::endl;
 
-	for(const auto & line : sect.description().lines()){
+	for(const auto & line : sect.lines()){
 		os << "\t";
 		os << line;
 		os << std::endl;
