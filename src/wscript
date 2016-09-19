@@ -5,7 +5,7 @@ from os import path
 
 def build(bld):
     #warning: order matters (pcre2plus should be before pcre2)
-    conan_deps = ['pcre2plus', 'pcre2', 'commonex', 'function_traits']
+    conan_deps = ['pcre2plus', 'pcre2', 'commonex', 'function_traits', 'tinydir']
 
     bld(
         name            = 'cppgherkin',

@@ -11,7 +11,7 @@ using namespace cppgherkin;
 using namespace fakeit;
 
 #define FIXTURE RunnerTest
-#define TEST_TAG "GherkinRunner"
+#define TEST_TAG "[GherkinRunner]"
 
 template<typename Ret, typename ...Args>
 struct Functor{

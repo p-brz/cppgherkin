@@ -8,7 +8,7 @@
 using namespace cppgherkin;
 
 #define FIXTURE ParserTest
-#define TEST_TAG "GherkinParser"
+#define TEST_TAG "[GherkinParser]"
 
 class ParserTest{
 public:

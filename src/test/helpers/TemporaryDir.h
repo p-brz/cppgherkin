@@ -1,0 +1,4 @@
+#ifndef TEMPORARYDIR_H
+#define TEMPORARYDIR_H
+
+#endif // TEMPORARYDIR_H
