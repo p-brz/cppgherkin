@@ -96,6 +96,7 @@ bool FeatureParser::parseDefinition(Section & section){
 	return false;
 }
 
+inline
 void FeatureParser::parseDescription(Section & section, bool extractKey){
 
 	std::string line;
@@ -118,6 +119,7 @@ void FeatureParser::parseDescription(Section & section, bool extractKey){
 	}
 }
 
+inline
 void FeatureParser::parseScenarios(){
 	while(input){
 		Scenario scenario;

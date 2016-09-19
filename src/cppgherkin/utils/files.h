@@ -116,10 +116,7 @@ inline void removeAll(Iter begin, Iter end){
 	};
 }
 
-
 }//namespace
-
-
 }//namespace
 
 #endif // FILES_H

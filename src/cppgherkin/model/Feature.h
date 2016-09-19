@@ -60,6 +60,19 @@ public:
 	const ScenarioList & scenarios() const{
 		return _scenarios;
 	}
+	template<typename T=ScenarioList>
+	Feature& scenarios(ScenarioList&& _scenarios){
+		this->_scenarios = std::forward<ScenarioList>(_scenarios);
+		return *this;
+	}
+
+public:
+	bool operator==(const Feature & other) const{
+		//NOTE: currently, compares all scenario lines (in worst case), what may be slow
+		//performance may be enhanced by using cached hashs to compare
+		return super::operator==(other)
+				&& scenarios() == other.scenarios();
+	}
 
 private:
 	template<typename T>

@@ -15,6 +15,7 @@ public:
 	Feature parse(std::istream & featureStream);
 };
 
+inline
 Feature GherkinParser::parse(const std::string & filepath){
 	std::ifstream input{filepath, std::ios_base::in};
 	return parse(input);

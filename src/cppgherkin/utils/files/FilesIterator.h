@@ -85,8 +85,12 @@ public:
 		return *this;
 	}
 
-	Path operator*(){
+	Path operator*() const{
 		return isEnd() ? Path() : Path{current_file->path};
+	}
+
+	operator bool() const{
+		return !isEnd();
 	}
 
 protected:

@@ -1,7 +1,5 @@
 #include "test.h"
 
-#include "cppgherkin/utils/files.h"
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -9,6 +7,10 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+
+#include "cppgherkin/utils/files.h"
+
+#include "helpers/TemporaryDir.h"
 
 using namespace cppgherkin;
 
@@ -19,16 +21,6 @@ constexpr const size_t  maxFilename = 16;
 
 class FileUtilsFixture{
 public:
-	struct SeedRandom{
-		SeedRandom(){
-			srand(time(NULL));
-		}
-	};
-
-	FileUtilsFixture(){
-		//ensure that the random generator will be seed once
-		static SeedRandom seed;
-	}
 
 public:
 	using PathsList = deque<string>;
@@ -236,15 +228,5 @@ TEST_CASE("create dir"){
 /* ******************************************** Helpers *****************************************************/
 
 string FileUtilsFixture::tmpname(size_t size){
-	int range = 'z' - 'a';
-
-	string name;
-	name.reserve(size);
-
-	for (int i = 0; i < size; ++i) {
-		char c = (char)((rand()%range) + 'a');
-		name.push_back(c);
-	}
-
-	return name;
+	return TemporaryDir::randomName(size);
 }

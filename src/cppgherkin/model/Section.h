@@ -12,11 +12,7 @@ public:
 	using Lines = std::vector<Line>;
 
 public:
-
-
 	Section() = default;
-	Section(const Section & other) = default;
-	Section(Section && other) = default;
 
 	Section(const std::string& key, const std::string& title=std::string())
 		: _key(key)
@@ -29,6 +25,11 @@ public:
 	MAKE_PROPERTY(Section, Lines, lines)
 
 
+	bool operator==(const Section& other)const{
+		return title() == other.title()
+			&& key() == other.key()
+			&& lines() == other.lines();
+	}
 public:
 	Section & addLine(const Line & l){
 		_lines.push_back(l);

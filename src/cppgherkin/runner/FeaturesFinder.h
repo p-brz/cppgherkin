@@ -1,14 +1,13 @@
 #ifndef FEATURESFINDER_H
 #define FEATURESFINDER_H
 
-#include "../utils/files.h"
+#include <vector>
+#include <string>
 
+#include "../utils/files.h"
+#include "FeaturesIterator.h"
 
 namespace cppgherkin {
-
-class FeaturesContainer{
-
-};
 
 class FeaturesFinder{
 public:
@@ -20,7 +19,7 @@ ListPaths featureFiles(const std::string & featuresDir){
 }
 
 FeaturesContainer features(const std::string & featuresDir){
-	return {};
+	return {featuresDir};
 }
 
 };
